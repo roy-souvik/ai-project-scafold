@@ -1,7 +1,6 @@
+import hashlib
 from .base_model import BaseModel
 from typing import List, Dict, Any
-
-import hashlib
 
 def _hash(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -16,7 +15,7 @@ class UserModel(BaseModel):
         r = cur.fetchone()
 
         return dict(r) if r else None
-    
+
     def find_user_with_companies(self, user_id):
         sql = '''
         SELECT u.*, cu.company_id, c.name as company_name, cu.role as company_role
@@ -52,7 +51,7 @@ class UserModel(BaseModel):
 
     def find_user_full_profile(self, user_id):
         sql = '''
-        SELECT u.*, 
+        SELECT u.*,
             cu.company_id, c.name as company_name, cu.role as company_role,
             du.department_id, d.name as department_name,
             r.name as role_name, r.guard
@@ -67,7 +66,7 @@ class UserModel(BaseModel):
         '''
         cur = self.conn.execute(sql, (user_id,))
         return [dict(row) for row in cur.fetchall()]
-    
+
     def authenticate(self,email,password):
         cur = self.conn.execute('select password from users where email = ?',(email,))
         r = cur.fetchone()
@@ -75,4 +74,4 @@ class UserModel(BaseModel):
             return False
         stored_hash = r['password']
         return stored_hash == _hash(password)
-    
+

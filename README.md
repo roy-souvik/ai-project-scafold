@@ -1,6 +1,6 @@
-# 📘 INCIDENT IQ
+# 📘 AI Project Scafold
 
-Incident IQ for cloud infra.
+AI project scafold.
 
 🚀 Project Setup
 
@@ -10,7 +10,6 @@ Python 3.12+
 
 Docker & Docker Compose (optional, for containerized runs)
 
-pip 23+ and setuptools 61+
 
 🐍 Run Locally (without Docker)
 
@@ -54,7 +53,7 @@ APP_ENV=development
 LOG_LEVEL=debug
 
 📦 Project Structure
-incident_management/
+project-wrapper/
 ├── src/epoch_explorer/          # Core package code
 ├── scripts/                  # Entry point scripts
 ├── pyproject.toml            # Editable install config
@@ -70,16 +69,13 @@ incident_management/
 
 requirements.txt
 
-
 Use it when you don’t want editable installs, e.g., for production builds:
 
 pip install -r requirements.txt
 
-
 In Dockerfile, you could optionally replace:
 
 RUN pip install -e .
-
 
 with:
 

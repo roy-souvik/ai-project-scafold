@@ -1,3 +1,11 @@
-python-dotenv>=1.2.1
+python-dotenv
 setuptools>=80.9.0
-wheel>=0.45.1
+wheel
+python-multipart
+httpx
+fastapi
+uvicorn[standard]
+requests>=2.31
+pydantic>=2.5
+streamlit
+chromadb==1.1.1

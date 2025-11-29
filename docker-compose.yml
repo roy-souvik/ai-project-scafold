@@ -1,7 +1,47 @@
 services:
+  ollama:
+    build: ./ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    command: ["serve"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - vector_db:/chroma
   app:
     build: .
     container_name: epoch_explorer_app
+    depends_on:
+      - ollama
+      - chroma
+    ports:
+      - "8501:8501"  # Streamlit
+      - "8001:8001"  # FastAPI
+    working_dir: /workspace
     volumes:
-      - .:/app
-    command: python scripts/run_test.py
+      - ./src/epoch_explorer:/workspace
+    command: >
+      bash -c "
+        pip install --no-cache-dir -r requirements.txt &&
+        uvicorn api:app --host 0.0.0.0 --port 8001 &
+        streamlit run app.py --server.port 8501
+      "
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+  vector_db:

@@ -31,12 +31,13 @@ services:
     ports:
       - "8501:8501"  # Streamlit
       - "8001:8001"  # FastAPI
-    working_dir: /workspace
+    working_dir: /workspace/src/epoch_explorer
+    environment:
+      - PYTHONPATH=/workspace/src
     volumes:
-      - ./src/epoch_explorer:/workspace
+      - ./src:/workspace/src:delegated
     command: >
       bash -c "
-        pip install --no-cache-dir -r requirements.txt &&
         uvicorn api:app --host 0.0.0.0 --port 8001 &
         streamlit run app.py --server.port 8501
       "

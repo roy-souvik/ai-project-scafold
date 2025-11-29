@@ -1,19 +1,25 @@
 FROM python:3.12-slim
 
-# Set working directory
-WORKDIR /app
+# use a dedicated build dir so runtime /workspace isn't overwritten/ambiguous
+WORKDIR /tmp/project
 
-# Copy dependency list and install
-COPY requirements.txt ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN apt-get update && apt-get install -y build-essential libsqlite3-dev curl portaudio19-dev \
+    espeak espeak-ng-data libespeak-ng1 alsa-utils && rm -rf /var/lib/apt/lists/*
 
-# Copy source and scripts
-COPY src ./src
-COPY scripts ./scripts
-COPY .env ./
+RUN python -m pip install --upgrade pip setuptools wheel
 
-# Set Python path to src (so imports like "from incident_iq..." work)
-ENV PYTHONPATH=/app/src
+# copy requirements if you use one
+COPY requirements.txt .
 
-# Default command
-CMD ["python", "scripts/run_test.py"]
+# copy project for editable install
+COPY pyproject.toml /tmp/project/pyproject.toml
+COPY src /tmp/project/src
+
+# install requirements first (if present) then package
+RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+RUN pip install -e /tmp/project
+
+# switch to runtime workspace (this is where your volume will mount)
+WORKDIR /workspace
+
+CMD ["bash", "-c", "uvicorn api:app --host 0.0.0.0 --port 8001 & streamlit run app.py --server.port=8501"]

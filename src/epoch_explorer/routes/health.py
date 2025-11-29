@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from epoch_explorer.services.rag_pipeline import query_rag
 
 router = APIRouter(tags=["health"])
 
@@ -37,19 +38,32 @@ async def add_doc(request: Request):
         return {"error": str(e)}
 
 
+# @router.post("/query")
+# async def query_doc(request: Request):
+#     """Legacy query endpoint"""
+#     try:
+#         data = await request.json()
+#         question = data.get("question")
+#         if not question:
+#             return {"error": "Missing 'question' field"}
+
+#         from src.rag.agents.langgraph_agent.langgraph_rag_agent import LangGraphRAGAgent
+#         agent = LangGraphRAGAgent()
+#         result = agent.ask_question(question)
+
+#         return result
+#     except Exception as e:
+#         return {"error": str(e)}
+
+
 @router.post("/query")
 async def query_doc(request: Request):
-    """Legacy query endpoint"""
     try:
         data = await request.json()
         question = data.get("question")
         if not question:
             return {"error": "Missing 'question' field"}
-
-        from src.rag.agents.langgraph_agent.langgraph_rag_agent import LangGraphRAGAgent
-        agent = LangGraphRAGAgent()
-        result = agent.ask_question(question)
-
-        return result
+        return {"answer": query_rag(question)}
     except Exception as e:
+        traceback.print_exc()
         return {"error": str(e)}

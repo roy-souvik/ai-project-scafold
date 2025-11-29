@@ -1,0 +1,7 @@
+services:
+  app:
+    build: .
+    container_name: epoch_explorer_app
+    volumes:
+      - .:/app
+    command: python scripts/run_test.py

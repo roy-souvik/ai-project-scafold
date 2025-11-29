@@ -14,8 +14,8 @@ Docker & Docker Compose (optional, for containerized runs)
 🐍 Run Locally (without Docker)
 
 # 1. Clone the repo
-git clone https://github.com/yourusername/projectname.git
-cd projectname
+git clone https://github.com/roy-souvik/ai-project-scafold.git
+cd ai-project-scafold
 
 # 2. (Optional) Create a virtual environment
 python -m venv venv
@@ -25,7 +25,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 
 # 4. Run test script
-python scripts/run_test.py
+python scripts/setup_db.py
 
 
 Expected output:
@@ -39,7 +39,6 @@ docker compose up --build
 
 # 2. Stop the container
 docker compose down
-
 
 To open a shell inside the container:
 

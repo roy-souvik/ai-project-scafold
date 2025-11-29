@@ -1,115 +1,72 @@
 import streamlit as st
 from dotenv import load_dotenv
-from pathlib import Path
+from pages import (
+    dashboard,
+    incident_analysis_crew,
+    reports_incidents,
+    reports_alerts,
+    settings,
+    workflow_visual,
+    login,
+)
 
 load_dotenv()
+st.set_page_config(page_title="Incident IQ", page_icon="🚨", layout="wide")
 
-# Page config
-st.set_page_config(
-    page_title="RAG Assistant Hub",
-    page_icon="🤖",
-    layout="wide"
-)
+if 'user_logged_in' not in st.session_state:
+    st.session_state.user_logged_in = False
+    st.session_state.username = None
 
-# Sidebar navigation
-st.sidebar.title("🧭 Navigation")
-page = st.sidebar.radio(
-    "Select Page",
-    [
-        "🏠 Home",
-        "💬 User Chat",
-        "⚙️ Admin Chat",
-        "🔍 Query",
-        "📊 Dashboard"
-    ]
-)
+# if not logged in, show login page only
+if not st.session_state.user_logged_in:
+    login.show()
+    st.stop()
 
-st.sidebar.divider()
-st.sidebar.info("💡 Select a page to get started")
+# Top user info (kept minimal)
+col1, col2 = st.columns([6, 1])
+with col2:
+    st.markdown(f"""
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="background:#8B5CF6;color:white;width:32px;height:32px;border-radius:50%;
+                  display:flex;align-items:center;justify-content:center;font-weight:600;">
+        {st.session_state.username[0].upper() if st.session_state.username else "U"}
+      </div>
+      <div style="font-weight:500;">{st.session_state.username or "User"}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Routes
-if page == "🏠 Home":
-    st.title("🤖 RAG Assistant Hub")
-    st.markdown("""
-    Welcome to the RAG (Retrieval-Augmented Generation) Assistant Hub!
-    
-    Choose your role:
-    """)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("💬 User Mode")
-        st.write("""
-        - Ask questions about documents
-        - Get concise or detailed answers
-        - View source documents
-        - Export chat history
-        """)
-        if st.button("Go to User Chat →", use_container_width=True):
-            st.switch_page("pages/chat_user.py")
-    
-    with col2:
-        st.subheader("⚙️ Admin Mode")
-        st.write("""
-        - Ingest new documents
-        - Heal and optimize embeddings
-        - Monitor system health
-        - Advanced analytics
-        """)
-        if st.button("Go to Admin Chat →", use_container_width=True):
-            st.switch_page("pages/chat_rag_admin.py")
+pages = [
+    st.Page("pages/dashboard.py", title="Dashboard", icon="📊"),
+    st.Page("pages/incident_analysis_crew.py", title="Analyze Incident", icon="🔍"),
+    st.Page("pages/reports_incidents.py", title="Incidents Report", icon="📋"),
+    st.Page("pages/reports_alerts.py", title="Alerts Report", icon="🔔"),
+    st.Page("pages/workflow_visual.py", title="Workflow Visualization", icon="🧩"),
+    st.Page("pages/settings.py", title="Settings", icon="⚙️"),
+]
 
-elif page == "💬 User Chat":
-    from pages.chat_user import show
-    show()
+with st.sidebar:
+    st.markdown("<h1 style='font-size:20px'>Incident IQ</h1>", unsafe_allow_html=True)
+    st.divider()
 
-elif page == "⚙️ Admin Chat":
-    from pages.chat_rag_admin import show_admin_chat
-    show_admin_chat()
+page = st.navigation(pages)
+title = getattr(page, "title", "Dashboard")
 
-elif page == "🔍 Query":
-    st.title("🔍 Direct Query")
-    st.markdown("Ask a question directly without chat history")
-    
-    query = st.text_input("Your question")
-    mode = st.selectbox("Response Mode", ["concise", "verbose"])
-    
-    if st.button("Search"):
-        if query:
-            with st.spinner("Searching..."):
-                try:
-                    from src.rag.agents.langgraph_agent.langgraph_rag_agent import LangGraphRAGAgent
-                    agent = LangGraphRAGAgent()
-                    result = agent.ask_question(query, response_mode=mode)
-                    
-                    if result.get("success"):
-                        st.success("✓ Found answer!")
-                        st.write(result.get("answer"))
-                    else:
-                        st.error("Query failed")
-                except Exception as e:
-                    st.error(f"Error: {str(e)}")
-
-elif page == "📊 Dashboard":
-    st.title("📊 System Dashboard")
-    st.markdown("View system health and metrics")
-    
-    try:
-        from src.rag.agents.langgraph_agent.langgraph_rag_agent import LangGraphRAGAgent
-        
-        agent = LangGraphRAGAgent()
-        
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.metric("LLM Service", "✓ Online" if agent.llm_service else "✗ Offline")
-        
-        with col2:
-            st.metric("Vector DB", "✓ Online" if agent.vectordb_service else "✗ Offline")
-        
-        with col3:
-            st.metric("RL Agent", "✓ Ready" if agent.rl_healing_agent else "⚠️ N/A")
-    
-    except Exception as e:
-        st.error(f"Dashboard error: {str(e)}")
+# Route by title and call each module's .show()
+if title == "Dashboard":
+    dashboard.show()
+elif title == "Analyze Incident":
+    incident_analysis_crew.show()
+elif title == "Incidents Report":
+    reports_incidents.show()
+elif title == "Approve Suggestions":
+    admin_approvals.show()
+elif title == "Alerts Report":
+    reports_alerts.show()
+elif title == "Workflow Visualization":
+    workflow_visual.show()
+elif title == "Settings":
+    settings.show()
+elif title == "Logout" or title == "🔐 Logout":
+    st.session_state.user_logged_in = False
+    st.session_state.username = None
+    st.experimental_rerun()

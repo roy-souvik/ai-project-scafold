@@ -22,7 +22,10 @@ COPY requirements.txt .
 # Install dependencies (cached unless requirements.txt changes)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all application code last (changes frequently, doesn't re-run pip install)
+# Copy all application code
 COPY . .
+
+# Install package in editable mode so imports work correctly
+RUN pip install -e .
 
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]

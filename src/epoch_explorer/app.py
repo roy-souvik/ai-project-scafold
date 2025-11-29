@@ -8,6 +8,7 @@ from pages import (
     settings,
     workflow_visual,
     login,
+    rag_qa,
 )
 
 load_dotenv()
@@ -42,10 +43,11 @@ pages = [
     st.Page("pages/reports_alerts.py", title="Alerts Report", icon="🔔"),
     st.Page("pages/workflow_visual.py", title="Workflow Visualization", icon="🧩"),
     st.Page("pages/settings.py", title="Settings", icon="⚙️"),
+    st.Page("pages/rag_qa.py", title="Rag Q&A", icon="📚"),
 ]
 
 with st.sidebar:
-    st.markdown("<h1 style='font-size:20px'>Incident IQ</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='font-size:20px'>Application</h1>", unsafe_allow_html=True)
     st.divider()
 
 page = st.navigation(pages)
@@ -54,6 +56,8 @@ title = getattr(page, "title", "Dashboard")
 # Route by title and call each module's .show()
 if title == "Dashboard":
     dashboard.show()
+elif title == "Rag Q&A":
+    rag_qa.show()
 elif title == "Analyze Incident":
     incident_analysis_crew.show()
 elif title == "Incidents Report":

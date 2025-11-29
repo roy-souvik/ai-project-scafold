@@ -1,6 +1,5 @@
 from pathlib import Path
 import streamlit as st
-
 from epoch_explorer.database.db.connection import get_connection
 from epoch_explorer.database.models.user import UserModel
 

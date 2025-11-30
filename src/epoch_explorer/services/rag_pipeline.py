@@ -4,6 +4,7 @@ from langchain_ollama import ChatOllama
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_chroma import Chroma
 import chromadb
+# from epoch_explorer.services.tracing import trace_operation
 
 # Load environment variables
 load_dotenv()
@@ -60,6 +61,7 @@ def query_rag(question: str):
 
     return response.content
 
+# @trace_operation("query_llm")
 def query_llm(question: str):
     """Query LLM for reqular Q/A."""
 

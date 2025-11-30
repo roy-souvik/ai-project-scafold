@@ -22,7 +22,6 @@ def show():
                         res = requests.post(
                             f"{API_URL}/query",
                             json={"question": question},
-                            timeout=30
                         )
                         if res.status_code == 200:
                             answer = res.json().get("answer", "No answer returned")

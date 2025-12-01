@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from epoch_explorer.routes import health_router, mcp_router
+from epoch_explorer.routes import health_router
 
 app = FastAPI(
     title="API Service",
@@ -9,4 +9,3 @@ app = FastAPI(
 
 # Include routers
 app.include_router(health_router)
-app.include_router(mcp_router)
